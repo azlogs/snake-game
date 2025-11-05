@@ -80,7 +80,27 @@ const snake = {
     },
 
     die: function(){
+        this.isDead = true;
+        this.stop();
+    },
 
+    checkSelfCollision: function(){
+        // Only check self-collision if snake has length > 3 (skip checking until snake has at least 4 segments)
+        if (this.length <= 3) return false;
+        
+        // Check if head collides with any body part (starting from index 3 to skip the parts right behind the head)
+        for(let i = 3; i < this.length; i++){
+            const snakePart = document.getElementById("snake-part" + i);
+            if (snakePart) {
+                const partLeft = parseInt(snakePart.style.left);
+                const partTop = parseInt(snakePart.style.top);
+                
+                if (this.position.left === partLeft && this.position.top === partTop){
+                    return true;
+                }
+            }
+        }
+        return false;
     },
 
     eat: function(obstacle, size){
@@ -178,8 +198,8 @@ const obstacle = {
     },
     randomPosition: function(){
         this.position = {
-            left: Math.floor(Math.random() * 70 + 25),
-            top: Math.floor(Math.random() * 480 + 25)
+            left: Math.floor(Math.random() * (cage.length - 50) / 25) * 25,
+            top: Math.floor(Math.random() * (cage.width - 50) / 25) * 25
         }
         this.render();
     }
@@ -258,11 +278,18 @@ const gamePlay = {
                 snake.position.left < 0 ||
                 snake.position.top < 0 ||
                 snake.position.top > cage.width - 25){
-                    snake.isDead = true;
+                    snake.die();
+            }
+
+            // Check self-collision
+            if (snake.checkSelfCollision()){
+                snake.die();
             }
 
             if (snake.isDead){
-                snake.stop();
+                clearInterval(this.checkingInterval);
+                alert("Game Over! Your score: " + this.point + " | Level: " + this.level + "\nPress OK to restart");
+                location.reload();
             }
           
         }, 10);
