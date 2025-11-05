@@ -85,7 +85,7 @@ const snake = {
     },
 
     checkSelfCollision: function(){
-        // Only check self-collision if snake has length > 3 and has actually moved
+        // Only check self-collision if snake has length > 3 (skip checking until snake has at least 4 segments)
         if (this.length <= 3) return false;
         
         // Check if head collides with any body part (starting from index 3 to skip the parts right behind the head)
